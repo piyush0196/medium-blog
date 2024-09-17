@@ -1,9 +1,8 @@
-import React from "react";
 import { Appbar } from "./Appbar";
 import { Blog } from "../hooks";
 import { Avatar } from "./BlogCard";
 
-export const SingleBlog = ({ blog }: Blog) => {
+export const SingleBlog = ({blog}: {blog: Blog}) => {
   return (
     <div>
       <Appbar />

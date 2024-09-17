@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Quote from "../component/Quote";
 import { Link, useNavigate } from "react-router-dom";
 import { SigninInput } from "@100xdevs/medium-common";

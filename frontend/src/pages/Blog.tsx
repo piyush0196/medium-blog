@@ -1,4 +1,3 @@
-import React from "react";
 import { useBlog } from "../hooks";
 import { SingleBlog } from "../component/SingleBlog";
 import { useParams } from "react-router-dom";
@@ -8,7 +7,7 @@ export const Blog = () => {
   const { id } = useParams();
   const { blog, loading } = useBlog(id || "");
 
-  if (loading) {
+  if (loading || !blog) {
     return (
       <div className="h-screen flex items-center justify-center">
         <Spinner />
