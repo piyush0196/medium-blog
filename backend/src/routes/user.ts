@@ -19,13 +19,13 @@ userRouter.post("/signup", async (c) => {
     const body = await c.req.json();
     const {success} =  signupInput.safeParse(body)
     if(!success) {
-      return c.json({status: 411, message: 'Invalid inputs!'})
+      return c.status(411)
     }
     try {
       const newUser = await prisma.user.create({
         data: {
           name: body.name,
-          email: body.email,
+          email: body.username,
           password: body.password,
         },
       });
@@ -36,7 +36,7 @@ userRouter.post("/signup", async (c) => {
   
     } catch (e) {
       c.status(411)
-      return c.text('Invalid ')
+      return c.text('Invalid')
     }
   });
   
@@ -48,19 +48,16 @@ userRouter.post("/signup", async (c) => {
     const body = await c.req.json();
     const {success} =  signinInput.safeParse(body)
     if(!success) {
-      return c.json({status: 411, message: 'Invalid inputs!'})
+      return c.json({ error: 'Invalid Inputs!' }, 411)
     }
     const user = await prisma.user.findFirst({
       where: {
-        email: body.email,
+        email: body.username,
         password: body.password
       }
     })
     if(!user) {
-      return c.json({
-        status: '401',
-        message: 'Incorrect Creds'
-      })
+      return c.json({ error: 'Invalid Creds!' }, 404)
     }
   
     const token =  await sign({id: user.id}, c.env.JWT_SECRET);

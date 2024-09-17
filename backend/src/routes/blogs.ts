@@ -28,10 +28,7 @@ blogRouter.use("*", async (c, next) => {
     c.set("userId", String(user.id));
     await next();
   } catch (error) {
-    return c.json({
-        status: 401,
-        message: "User is not logged in.!",
-      });
+      return c.json({ error:"User is not logged in.!" }, 401)
   }
 });
 
@@ -46,7 +43,8 @@ blogRouter.post("/", async (c) => {
 
   const {success} =  createBlogInput.safeParse(body)
   if(!success) {
-    return c.json({status: 411, message: 'Invalid inputs!'})
+    return c.json({ error: 'Invalid inputs!' }, 411)
+
   }
 
   try {
@@ -76,7 +74,7 @@ blogRouter.put("/", async (c) => {
   const body = await c.req.json();
   const {success} =  updateBlogInput .safeParse(body)
   if(!success) {
-    return c.json({status: 411, message: 'Invalid inputs!'})
+    return c.json({ error: 'Invalid inputs!' }, 411)
   }
   const blog = await prisma.posts.update({
     where: {
@@ -100,11 +98,22 @@ blogRouter.get("/bulk", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
   try {
-    const allBlogs = await prisma.posts.findMany({});
+    const allBlogs = await prisma.posts.findMany({
+      select: {
+        id: true,
+        content: true,
+        title: true,
+        author: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
 
     return c.json({ allBlogs });
   } catch (error) {
-    return c.json({ status: 500, message: "Internal server error" });
+    return c.json({ error: "Internal server error"  }, 500)
   }
 });
 
@@ -120,14 +129,23 @@ blogRouter.get("/:id", async (c) => {
       where: {
         id,
       },
+      select:{
+        id: true,
+        title:true,
+        content: true,
+        author: {
+          select: {
+            name: true
+          }
+        }
+      }
     });
 
     if (!blog) {
-      return c.json({ status: 404, message: "Blog does not exists!" });
+      return c.json({ error: "Blog does not exists!" }, 404)
     }
-
     return c.json({ blog });
   } catch (error) {
-    return c.json({ status: 500, message: "Internal server error" });
+    return c.json({ error: "Internal server error" }, 500)
   }
 });
